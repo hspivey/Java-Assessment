@@ -1,4 +1,4 @@
-package com.cooksys.file;
+package com.cooksys.client;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -15,9 +15,6 @@ import java.net.Socket;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
-
-import com.cooksys.client.ToXML;
-
 public class FileLauncher {
 	public static void main(String[] args) throws IOException {
 		File f = null;
@@ -26,8 +23,7 @@ public class FileLauncher {
 		BufferedInputStream bis = null;
 		OutputStream os = null;
 		Socket sock = null;
-		BufferedReader incoming = null;
-		
+
 		try {
 
 			f = new File("C:\\Users\\ftd-09\\eclipse-workspace\\JavaAssessment\\Test files");
@@ -35,17 +31,21 @@ public class FileLauncher {
 			paths = f.list();
 
 			for (String path : paths) {
-				File toSend = new File(path+ "");
-				//incoming = new BufferedReader(new FileReader(TextToXml.doIt(path+"")));
+				File toSend = new File(path + "");
+				BufferedReader inputfromFile = new BufferedReader(new FileReader(path + ".txt"));
+				String firstLine = inputfromFile.readLine();
+
+				bos.writeUTF(firstLine);
 				DataOutputStream fos = new DataOutputStream(new FileOutputStream(toSend));
-				fos.writeChars(ToXML.begin(path+""));
+				// ToXML.begin(path);
+				// fos.writeChars(ToXML.begin(path + ""));
 				Box sendThis = new Box(toSend);
 				JAXBContext jc = JAXBContext.newInstance(Box.class);
 				Marshaller marshaller = jc.createMarshaller();
 				marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 				marshaller.marshal(sendThis, System.out);
 				marshaller.marshal(sendThis, new FileOutputStream(path + ".xml"));
-				sock = new Socket("127.0.0.1", 10201);
+				sock = new Socket("127.0.0.1", 10501);
 				File myFile = new File(path + ".xml");
 				byte[] mybytearray = new byte[(int) myFile.length()];
 				fis = new FileInputStream(myFile);
